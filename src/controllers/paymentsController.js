@@ -2,6 +2,7 @@ const MercadoPago = require('mercadopago');
 
 const getFullUrl = (req) =>{
     const url = req.protocol + '://' + req.get('host');
+    console.log('url full:')
     console.log(url)
     return url;
 }
@@ -9,7 +10,7 @@ const getFullUrl = (req) =>{
 module.exports = {
     async checkout(req, res){
 
-        console.log(process.env)
+        //console.log(process.env)
         MercadoPago.configure({
             sandbox: process.env.SANDBOX == 'true' ? true : false,
             access_token: process.env.MP_ACCESS_TOKEN
@@ -33,6 +34,14 @@ module.exports = {
               email: email
             },
             auto_return : "all",
+            payment_methods: {
+              "excluded_payment_types": [
+                {
+                    "id": "ticket"
+                }
+            ],
+              "installments": 1
+          },
             external_reference : id,
             back_urls : {
               success : getFullUrl(req) + "/payments/success",
@@ -49,4 +58,14 @@ module.exports = {
             return res.send(err.message);
           }
     }
+,
+
+  async getPayments(req, res){
+
+    var mercadopago = require('mercadopago')
+    mercadopago.configurations.setAccessToken(process.env.MP_ACCESS_TOKEN)
+    var payment_methods = await mercadopago.get("/v1/payment_methods")
+    return res.send(payment_methods)
+
+  }
 }

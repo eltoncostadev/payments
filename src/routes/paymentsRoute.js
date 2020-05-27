@@ -17,4 +17,6 @@ routes.get('/failure', (req, res) => {
     return res.render('failure_screen')
 })
 
+routes.get('/payment_methods', paymentsController.getPayments)
+
 module.exports = routes;
